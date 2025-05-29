@@ -1,56 +1,75 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_theme.dart';
+import '../../theme/typography.dart';
+
+typedef DataRowBuilder<T> = DataRow Function(T item);
 
 class AppTable<T> extends StatelessWidget {
   final List<String> columns;
   final List<T> items;
-  final int currentPage;
-  final int rowsPerPage;
-  final void Function(int) onPageChanged;
-  final DataRow Function(T item) buildRow;
+  final DataRowBuilder<T> buildRow;
+
+  // Opcional: para paginación si quieres extender después
+  final int? currentPage;
+  final int? rowsPerPage;
+  final ValueChanged<int>? onPageChanged;
 
   const AppTable({
     super.key,
     required this.columns,
     required this.items,
-    required this.currentPage,
-    required this.rowsPerPage,
-    required this.onPageChanged,
     required this.buildRow,
+    this.currentPage,
+    this.rowsPerPage,
+    this.onPageChanged,
   });
-
-  List<T> get currentItems {
-    final start = currentPage * rowsPerPage;
-    final end = (start + rowsPerPage).clamp(0, items.length);
-    return items.sublist(start, end);
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Table(
+      columnWidths: const {
+        0: FlexColumnWidth(2),
+        1: FlexColumnWidth(),
+        2: FlexColumnWidth(),
+        3: FlexColumnWidth(),
+        4: FlexColumnWidth(),
+        5: FixedColumnWidth(80),
+      },
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            columns: columns.map((col) => DataColumn(label: Text(col))).toList(),
-            rows: currentItems.map(buildRow).toList(),
+        TableRow(
+          decoration: const BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: Color(
+                    0xFFEEEEEE),
+              ),
+            ),
           ),
+          children: columns
+              .map(
+                (title) => Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    title,
+                    style: AppTypography.bodyLg
+                        .copyWith(fontWeight: FontWeight.bold, color: AppTheme.texttableColor),
+                  ),
+                ),
+              )
+              .toList(),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            IconButton(
-              onPressed: currentPage > 0 ? () => onPageChanged(currentPage - 1) : null,
-              icon: const Icon(Icons.arrow_back),
-            ),
-            Text('${currentPage + 1}'),
-            IconButton(
-              onPressed: (currentPage + 1) * rowsPerPage < items.length
-                  ? () => onPageChanged(currentPage + 1)
-                  : null,
-              icon: const Icon(Icons.arrow_forward),
-            ),
-          ],
-        ),
+        ...items.map((item) {
+          final row = buildRow(item);
+          return TableRow(
+            children: row.cells.map((cell) {
+              return Padding(
+                padding: const EdgeInsets.all(12),
+                child: cell.child,
+              );
+            }).toList(),
+          );
+        }).toList(),
       ],
     );
   }

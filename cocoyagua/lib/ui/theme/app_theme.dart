@@ -6,6 +6,8 @@ class AppTheme {
   static const Color secondaryColor = Color(0xFF00CC99);
   static const Color backgroundColor = Color(0xFFFFFFFF);
   static const Color textColor = Color(0xFF94A4AD);
+  static const Color textPrimaryColor = Color(0xFF3A474E);
+  static const Color texttableColor = Color(0xFF596E79);
 
   // Tema claro
   static ThemeData lightTheme = ThemeData(
@@ -18,7 +20,8 @@ class AppTheme {
       background: backgroundColor,
     ),
     textTheme: const TextTheme(
-      headlineLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: textColor),
+      headlineLarge: TextStyle(
+          fontSize: 32, fontWeight: FontWeight.bold, color: textColor),
       bodyLarge: TextStyle(fontSize: 16, color: textColor),
     ),
     appBarTheme: const AppBarTheme(
@@ -26,7 +29,17 @@ class AppTheme {
       foregroundColor: Colors.white,
       elevation: 2,
     ),
+    dataTableTheme: const DataTableThemeData(
+      dividerThickness: 0.0,
+      headingRowColor:
+          MaterialStatePropertyAll(Color(0xFFF5F5F5)),
+      dataRowColor: MaterialStatePropertyAll(
+          Colors.transparent),
+    ),
+    dividerColor: Colors
+        .transparent, 
   );
+
 
   // Tema oscuro (opcional)
   static ThemeData darkTheme = ThemeData(
@@ -41,4 +54,6 @@ class AppTheme {
       bodyLarge: TextStyle(fontSize: 16, color: Colors.white),
     ),
   );
+
+  
 }

@@ -5,8 +5,9 @@ class AppButton extends StatelessWidget {
   final VoidCallback onPressed;
   final bool primary;
   final bool loading;
-  final double? width; // Nuevo: ancho opcional
-  final double? height; // Nuevo: alto opcional
+  final double? width;
+  final double? height;
+  final IconData? icon;
 
   const AppButton({
     super.key,
@@ -14,8 +15,9 @@ class AppButton extends StatelessWidget {
     required this.onPressed,
     this.primary = true,
     this.loading = false,
-    this.width, // Nuevo
-    this.height, // Nuevo
+    this.width,
+    this.height,
+    this.icon,
   });
 
   @override
@@ -31,8 +33,8 @@ class AppButton extends StatelessWidget {
     );
 
     return SizedBox(
-      width: width ?? double.infinity, // Ocupa todo el ancho por defecto
-      height: height, // Ajustable si se desea
+      width: width ?? double.infinity,
+      height: height,
       child: ElevatedButton(
         style: style,
         onPressed: loading ? null : onPressed,
@@ -42,7 +44,17 @@ class AppButton extends StatelessWidget {
                 height: 16,
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
-            : Text(text),
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (icon != null) ...[
+                    Icon(icon, size: 18),
+                    const SizedBox(width: 8),
+                  ],
+                  Text(text),
+                ],
+              ),
       ),
     );
   }

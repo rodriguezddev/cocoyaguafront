@@ -111,7 +111,6 @@ class _LoginViewState extends State<LoginView> {
                     child: isWide
                         ? Row(
                             children: [
-                              // Formulario con bordes izquierdo
                               Expanded(
                                 child: ClipRRect(
                                   borderRadius: const BorderRadius.only(
@@ -124,7 +123,6 @@ class _LoginViewState extends State<LoginView> {
                                   ),
                                 ),
                               ),
-                              // Imagen con bordes derecho solo en web
                               Expanded(child: image),
                             ],
                           )
