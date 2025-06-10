@@ -1,8 +1,13 @@
+import 'package:cocoyagua/ui/views/contratos/contratos_view.dart';
 import 'package:cocoyagua/ui/views/personas/personas_view.dart';
+import 'package:cocoyagua/ui/views/solicitudes/solicitudes_view.dart';
+import 'package:cocoyagua/ui/views/titular/titulares_view.dart';
 import 'package:flutter/material.dart';
 import 'package:cocoyagua/ui/theme/app_theme.dart';
 import 'package:cocoyagua/ui/views/login/login_view.dart';
 import 'package:cocoyagua/ui/views/dashboard/dashboard_view.dart';
+import 'package:cocoyagua/ui/views/tomas_domiciliarias/tomas_domiciliarias_view.dart';
+import 'package:cocoyagua/ui/views/productos_servicios/productos_servicios_view.dart'; // Importar la nueva vista
 
 void main() {
   runApp(const MyApp());
@@ -35,8 +40,12 @@ class _MyAppState extends State<MyApp> {
         '/gestion/personas': (context) => const PersonasView(),
         '/configuracion/region': (_) => const DummyPage('Región'),
         '/configuracion/empresa': (_) => const DummyPage('Empresa'),
-        '/gestion/productos': (_) => const DummyPage('Productos'),
+        '/gestion/productos_servicios': (_) => const ProductosServiciosView(), // Ruta para Productos y Servicios
         '/gestion/clientes': (_) => const DummyPage('Clientes'),
+        '/gestion&saneamiento/tomas_domiciliarias': (_) => const TomasDomiciliariasView(),
+        '/gestion&saneamiento/solicitudes': (_) => const SolicitudesView(),
+        '/gestion&saneamiento/titulares': (_) => const TitularesView(), 
+        '/gestion&saneamiento/contratos': (_) => const ContratosView(), 
         '/bitacora': (_) => const DummyPage('Bitácora'),
         
       },

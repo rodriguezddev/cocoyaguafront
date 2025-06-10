@@ -44,4 +44,9 @@ static const TextStyle body2 = TextStyle(
     fontSize: 14,
     color: AppTheme.textColor,
   );
+
+static const TextStyle bodySmall = TextStyle(
+    fontSize: 12,
+    color: AppTheme.textColor,
+  );
 }

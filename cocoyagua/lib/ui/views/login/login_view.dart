@@ -61,6 +61,7 @@ class _LoginViewState extends State<LoginView> {
           const SizedBox(height: 16),
           AppButton(
             text: 'Iniciar sesión',
+            width: double.infinity,
             onPressed: () {
               final usuario = _userController.text;
               final contrasena = _passwordController.text;

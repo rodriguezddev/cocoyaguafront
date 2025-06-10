@@ -24,12 +24,9 @@ import 'form_steps/step4_legal_representatives_info.dart';
 class PersonInformationForm extends StatefulWidget {
   final String tipoDocumento;
   final String numeroDocumento;
-  
-  const PersonInformationForm({
-    super.key, 
-    required this.tipoDocumento, 
-    required this.numeroDocumento
-  });
+
+  const PersonInformationForm(
+      {super.key, required this.tipoDocumento, required this.numeroDocumento});
 
   @override
   State<PersonInformationForm> createState() => _PersonInformationFormState();
@@ -56,15 +53,37 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
 
   List<Address> _addresses = []; // Lista para almacenar direcciones
   List<Contact> _additionalContacts = []; // Lista para contactos adicionales
-  List<LegalRepresentative> _legalRepresentatives = []; // Lista para representantes legales
+  List<LegalRepresentative> _legalRepresentatives =
+      []; // Lista para representantes legales
 
   // Options for dropdowns
   final List<String> _personTypeOptions = ['Natural', 'Jurídica'];
   final List<String> _genderOptions = ['Masculino', 'Femenino', 'Otro'];
-  final List<String> _documentTypeOptions = ['DNI', 'Pasaporte', 'Carnet de Extranjería'];
-  final List<String> _professionOptions = ['Ingeniero', 'Doctor', 'Abogado', 'Estudiante', 'Otro'];
-  final List<String> _countryOptions = ['Perú', 'Colombia', 'Chile', 'Argentina', 'Otro'];
-  final List<String> _departmentOptions = ['Lima', 'Arequipa', 'Cusco', 'Otro']; // Placeholder
+  final List<String> _documentTypeOptions = [
+    'DNI',
+    'Pasaporte',
+    'Carnet de Extranjería'
+  ];
+  final List<String> _professionOptions = [
+    'Ingeniero',
+    'Doctor',
+    'Abogado',
+    'Estudiante',
+    'Otro'
+  ];
+  final List<String> _countryOptions = [
+    'Perú',
+    'Colombia',
+    'Chile',
+    'Argentina',
+    'Otro'
+  ];
+  final List<String> _departmentOptions = [
+    'Lima',
+    'Arequipa',
+    'Cusco',
+    'Otro'
+  ]; // Placeholder
 
   @override
   void initState() {
@@ -90,7 +109,8 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Personas', style: AppTypography.h1.copyWith(color: AppTheme.textPrimaryColor)),
+        Text('Personas',
+            style: AppTypography.h1.copyWith(color: AppTheme.textPrimaryColor)),
         Row(
           children: [
             Column(
@@ -119,7 +139,8 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
   void _addOrUpdateAddress(Address address, {Address? oldAddress}) {
     setState(() {
       if (address.isPrimary) {
-        _addresses = _addresses.map((addr) => addr.copyWith(isPrimary: false)).toList();
+        _addresses =
+            _addresses.map((addr) => addr.copyWith(isPrimary: false)).toList();
       }
 
       if (oldAddress != null) {
@@ -129,10 +150,12 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
         }
       } else {
         _addresses.add(address);
-        if (_addresses.where((a) => a.isPrimary).isEmpty && _addresses.isNotEmpty) {
-           if(address.isPrimary || _addresses.length == 1) {
-            _addresses[_addresses.indexWhere((a) => a.id == address.id)] = address.copyWith(isPrimary: true);
-           }
+        if (_addresses.where((a) => a.isPrimary).isEmpty &&
+            _addresses.isNotEmpty) {
+          if (address.isPrimary || _addresses.length == 1) {
+            _addresses[_addresses.indexWhere((a) => a.id == address.id)] =
+                address.copyWith(isPrimary: true);
+          }
         }
       }
     });
@@ -141,7 +164,9 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
   void _deleteAddress(Address address) {
     setState(() {
       _addresses.removeWhere((a) => a.id == address.id);
-      if (address.isPrimary && _addresses.isNotEmpty && _addresses.where((a) => a.isPrimary).isEmpty) {
+      if (address.isPrimary &&
+          _addresses.isNotEmpty &&
+          _addresses.where((a) => a.isPrimary).isEmpty) {
         _addresses[0] = _addresses[0].copyWith(isPrimary: true);
       }
     });
@@ -159,20 +184,27 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
   void _addOrUpdateContact(Contact contact, {Contact? oldContact}) {
     setState(() {
       if (contact.isEmergencyContact) {
-        _additionalContacts = _additionalContacts.map((c) => c.copyWith(isEmergencyContact: false)).toList();
+        _additionalContacts = _additionalContacts
+            .map((c) => c.copyWith(isEmergencyContact: false))
+            .toList();
       }
 
       if (oldContact != null) {
-        final index = _additionalContacts.indexWhere((c) => c.id == oldContact.id);
+        final index =
+            _additionalContacts.indexWhere((c) => c.id == oldContact.id);
         if (index != -1) {
           _additionalContacts[index] = contact;
         }
       } else {
         _additionalContacts.add(contact);
-        if (_additionalContacts.where((c) => c.isEmergencyContact).isEmpty && _additionalContacts.isNotEmpty) {
-           if(contact.isEmergencyContact || _additionalContacts.length == 1 && contact.isEmergencyContact) {
-            _additionalContacts[_additionalContacts.indexWhere((c) => c.id == contact.id)] = contact.copyWith(isEmergencyContact: true);
-           }
+        if (_additionalContacts.where((c) => c.isEmergencyContact).isEmpty &&
+            _additionalContacts.isNotEmpty) {
+          if (contact.isEmergencyContact ||
+              _additionalContacts.length == 1 && contact.isEmergencyContact) {
+            _additionalContacts[
+                    _additionalContacts.indexWhere((c) => c.id == contact.id)] =
+                contact.copyWith(isEmergencyContact: true);
+          }
         }
       }
     });
@@ -187,17 +219,22 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
   void _setEmergencyContact(Contact contact, bool isEmergency) {
     setState(() {
       _additionalContacts = _additionalContacts.map((c) {
-        return c.copyWith(isEmergencyContact: c.id == contact.id ? isEmergency : (isEmergency ? false : c.isEmergencyContact));
+        return c.copyWith(
+            isEmergencyContact: c.id == contact.id
+                ? isEmergency
+                : (isEmergency ? false : c.isEmergencyContact));
       }).toList();
     });
   }
   // --- Fin Lógica para Contactos Adicionales ---
 
   // --- Lógica para Representantes Legales ---
-  void _addOrUpdateLegalRepresentative(LegalRepresentative representative, {LegalRepresentative? oldRepresentative}) {
+  void _addOrUpdateLegalRepresentative(LegalRepresentative representative,
+      {LegalRepresentative? oldRepresentative}) {
     setState(() {
       if (oldRepresentative != null) {
-        final index = _legalRepresentatives.indexWhere((r) => r.id == oldRepresentative.id);
+        final index = _legalRepresentatives
+            .indexWhere((r) => r.id == oldRepresentative.id);
         if (index != -1) {
           _legalRepresentatives[index] = representative;
         }
@@ -214,9 +251,6 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
   }
   // --- Fin Lógica para Representantes Legales ---
 
-
-
-
   @override
   Widget build(BuildContext context) {
     final isMobile = Responsive.isMobile(context);
@@ -230,7 +264,9 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
             child: Scaffold(
               appBar: AppBar(
                 automaticallyImplyLeading: false,
-                leading: isMobile ? BackButton(color: AppTheme.textColor) : null,
+                leading: BackButton( // Siempre visible
+                    color: AppTheme.textPrimaryColor, // Color consistente con otras vistas
+                    onPressed: () => Navigator.of(context).pop()),
                 title: _buildHeader(),
                 toolbarHeight: 80,
                 backgroundColor: Colors.transparent,
@@ -250,7 +286,8 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
                             children: [
                               Text(
                                 'Completar informacion de personas',
-                                style: AppTypography.h2.copyWith(color: AppTheme.textPrimaryColor),
+                                style: AppTypography.h2
+                                    .copyWith(color: AppTheme.textPrimaryColor),
                               ),
                               const SizedBox(height: Spacing.sm),
                               Text(
@@ -284,17 +321,20 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
         return Step1PersonalInfo(
           isMobile: isMobile,
           selectedPersonType: _selectedPersonType,
-          onPersonTypeChanged: (value) => setState(() => _selectedPersonType = value),
+          onPersonTypeChanged: (value) =>
+              setState(() => _selectedPersonType = value),
           primerNombreController: _primerNombreController,
           selectedGender: _selectedGender,
           onGenderChanged: (value) => setState(() => _selectedGender = value),
           fechaNacimientoController: _fechaNacimientoController,
           selectedProfession: _selectedProfession,
-          onProfessionChanged: (value) => setState(() => _selectedProfession = value),
+          onProfessionChanged: (value) =>
+              setState(() => _selectedProfession = value),
           numeroDocumentoController: _numeroDocumentoController,
           primerApellidoController: _primerApellidoController,
           selectedDocumentType: _selectedDocumentType,
-          onDocumentTypeChanged: (value) => setState(() => _selectedDocumentType = value),
+          onDocumentTypeChanged: (value) =>
+              setState(() => _selectedDocumentType = value),
           segundoNombreController: _segundoNombreController,
           segundoApellidoController: _segundoApellidoController,
           personTypeOptions: _personTypeOptions,

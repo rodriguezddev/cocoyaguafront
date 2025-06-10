@@ -209,7 +209,7 @@ class _PersonasViewState extends State<PersonasView> {
                           Row(
                             children: [
                               Expanded(
-                                flex: 3,
+                                flex: 4,
                                 child: AppInput(
                                   hintText: 'Buscar',
                                   controller: _userController,
@@ -248,20 +248,17 @@ class _PersonasViewState extends State<PersonasView> {
                                 ),
                               ),
                               const SizedBox(width: Spacing.md),
-                              Expanded(
-                                flex: 1,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment
-                                      .start, // o .center dependiendo del efecto
-                                  children: [
-                                    SizedBox(height: 28),
-                                    AppButton(
-                                      text: 'Crear Persona',
-                                      onPressed: () =>
-                                          _mostrarDialogoCrearPersona(context),
-                                    ),
-                                  ],
-                                ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment
+                                    .start, // o .center dependiendo del efecto
+                                children: [
+                                  SizedBox(height: 28),
+                                  AppButton(
+                                    text: 'Crear Persona',
+                                    onPressed: () =>
+                                        _mostrarDialogoCrearPersona(context),
+                                  ),
+                                ],
                               ),
                             ],
                           ),

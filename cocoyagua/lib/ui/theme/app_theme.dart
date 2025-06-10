@@ -8,7 +8,7 @@ class AppTheme {
   static const Color textColor = Color(0xFF94A4AD);
   static const Color textPrimaryColor = Color(0xFF3A474E);
   static const Color texttableColor = Color(0xFF596E79);
-
+  static const Color dangerColor = Color(0xFFD32F2F);
   // Tema claro
   static ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,

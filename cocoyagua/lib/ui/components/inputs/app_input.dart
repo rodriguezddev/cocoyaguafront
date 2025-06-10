@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
+import 'package:flutter/services.dart'; // Necesario para FilteringTextInputFormatter
 
 class AppInput extends StatelessWidget {
   final String label;
@@ -10,6 +11,10 @@ class AppInput extends StatelessWidget {
   final String? Function(String?)? validator;
   final bool isLabelVisible;
   final int? maxLines;
+  final bool readOnly; // Nueva propiedad
+  final VoidCallback? onTap; // Nueva propiedad
+  final List<TextInputFormatter>? inputFormatters; // Nueva propiedad
+  final ValueChanged<String>? onChanged; // Nueva propiedad
 
   const AppInput({
     super.key,
@@ -21,6 +26,10 @@ class AppInput extends StatelessWidget {
     this.validator,
     this.isLabelVisible = true,
     this.maxLines = 1,
+    this.readOnly = false, // Valor por defecto
+    this.onTap,
+    this.inputFormatters,
+    this.onChanged,
   });
 
   @override
@@ -45,6 +54,10 @@ class AppInput extends StatelessWidget {
           controller: controller,
           keyboardType: keyboardType,
           maxLines: maxLines, // Aplicar maxLines
+          readOnly: readOnly, // Aplicar readOnly
+          onTap: onTap, // Aplicar onTap
+          inputFormatters: inputFormatters, // Aplicar inputFormatters
+          onChanged: onChanged, // Aplicar onChanged
           style: TextStyle(color: textColor),
           decoration: InputDecoration(
             hintText: hintText,
