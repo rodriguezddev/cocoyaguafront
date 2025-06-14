@@ -20,23 +20,45 @@ import 'form_steps/step1_personal_info.dart';
 import 'form_steps/step2_addresses_info.dart';
 import 'form_steps/step3_contacts_info.dart';
 import 'form_steps/step4_legal_representatives_info.dart';
+import 'personas_view.dart'; // Required for Persona model
 
-class PersonInformationForm extends StatefulWidget {
-  final String tipoDocumento;
-  final String numeroDocumento;
-  final String? initialPersonType; // Nuevo parámetro
+class EditPersonInformationForm extends StatefulWidget {
+  final Persona personaToEdit;
+  // Optional fields for more complete pre-filling, if available
+  final String? initialPrimerNombre;
+  final String? initialSegundoNombre;
+  final String? initialPrimerApellido;
+  final String? initialSegundoApellido;
+  final String? initialFechaNacimiento;
+  final String? initialTelefono;
+  final String? initialCorreo;
+  final String? initialSelectedProfession;
+  final List<Address>? initialAddresses;
+  final List<Contact>? initialAdditionalContacts;
+  final List<LegalRepresentative>? initialLegalRepresentatives;
 
-  const PersonInformationForm(
-      {super.key,
-      required this.tipoDocumento,
-      required this.numeroDocumento,
-      this.initialPersonType // Añadir al constructor
-      });
+  const EditPersonInformationForm({
+    super.key,
+    required this.personaToEdit,
+    this.initialPrimerNombre,
+    this.initialSegundoNombre,
+    this.initialPrimerApellido,
+    this.initialSegundoApellido,
+    this.initialFechaNacimiento,
+    this.initialTelefono,
+    this.initialCorreo,
+    this.initialSelectedProfession,
+    this.initialAddresses,
+    this.initialAdditionalContacts,
+    this.initialLegalRepresentatives,
+  });
+
   @override
-  State<PersonInformationForm> createState() => _PersonInformationFormState();
+  State<EditPersonInformationForm> createState() =>
+      _EditPersonInformationFormState();
 }
 
-class _PersonInformationFormState extends State<PersonInformationForm> {
+class _EditPersonInformationFormState extends State<EditPersonInformationForm> {
   int _currentStep = 1;
 
   // Controllers for TextFields
@@ -55,12 +77,11 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
   String? _selectedDocumentType;
   String? _selectedProfession;
 
-  List<Address> _addresses = []; // Lista para almacenar direcciones
-  List<Contact> _additionalContacts = []; // Lista para contactos adicionales
-  List<LegalRepresentative> _legalRepresentatives =
-      []; // Lista para representantes legales
+  List<Address> _addresses = [];
+  List<Contact> _additionalContacts = [];
+  List<LegalRepresentative> _legalRepresentatives = [];
 
-  // Options for dropdowns
+  // Options for dropdowns (same as PersonInformationForm)
   final List<String> _personTypeOptions = ['Natural', 'Jurídica'];
   final List<String> _genderOptions = ['Masculino', 'Femenino', 'Otro'];
   final List<String> _documentTypeOptions = [
@@ -75,26 +96,55 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
     'Estudiante',
     'Otro'
   ];
-  final List<String> _countryOptions = [
+   final List<String> _countryOptions = [ // Kept for consistency, though not directly used in Step1
     'Perú',
     'Colombia',
     'Chile',
     'Argentina',
     'Otro'
   ];
-  final List<String> _departmentOptions = [
+  final List<String> _departmentOptions = [ // Kept for consistency
     'Lima',
     'Arequipa',
     'Cusco',
     'Otro'
-  ]; // Placeholder
+  ];
 
   @override
   void initState() {
     super.initState();
-    _selectedDocumentType = widget.tipoDocumento;
-    _numeroDocumentoController.text = widget.numeroDocumento;
-    _selectedPersonType = widget.initialPersonType; // Usar el tipo de persona inicial
+    // Pre-fill from personaToEdit (from the list)
+    _selectedDocumentType = widget.personaToEdit.tipoDocumento;
+    _numeroDocumentoController.text = widget.personaToEdit.nroDocumento;
+    _selectedGender = widget.personaToEdit.genero;
+    _selectedPersonType = widget.personaToEdit.tipoPersona;
+
+    // Pre-fill from optional detailed initial data
+    // For names, if specific initial names aren't provided, use nombreCompleto as a fallback for primerNombre.
+    // A more robust solution would involve parsing nombreCompleto or having separate fields in the Persona model.
+    _primerNombreController.text = widget.initialPrimerNombre ?? widget.personaToEdit.nombreCompleto;
+    _segundoNombreController.text = widget.initialSegundoNombre ?? "";
+    _primerApellidoController.text = widget.initialPrimerApellido ?? "";
+    _segundoApellidoController.text = widget.initialSegundoApellido ?? "";
+    
+    _fechaNacimientoController.text = widget.initialFechaNacimiento ?? '';
+    _telefonoController.text = widget.initialTelefono ?? '';
+    _correoController.text = widget.initialCorreo ?? '';
+    _selectedProfession = widget.initialSelectedProfession;
+
+    _addresses = widget.initialAddresses != null ? List<Address>.from(widget.initialAddresses!) : [];
+    _additionalContacts = widget.initialAdditionalContacts != null ? List<Contact>.from(widget.initialAdditionalContacts!) : [];
+    _legalRepresentatives = widget.initialLegalRepresentatives != null ? List<LegalRepresentative>.from(widget.initialLegalRepresentatives!) : [];
+
+    // Ensure primary address logic is applied if addresses are pre-filled
+    if (_addresses.isNotEmpty && _addresses.where((a) => a.isPrimary).isEmpty) {
+      _addresses[0] = _addresses[0].copyWith(isPrimary: true);
+    }
+    // Ensure emergency contact logic is applied if contacts are pre-filled
+     if (_additionalContacts.isNotEmpty && _additionalContacts.where((c) => c.isEmergencyContact).isEmpty) {
+      // Heuristic: mark first as emergency if none are, or based on specific logic if available
+      // For now, let's not auto-mark one unless explicitly set or only one contact exists.
+    }
   }
 
   @override
@@ -114,7 +164,7 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Personas',
+        Text('Personas', // Main section title
             style: AppTypography.h1.copyWith(color: AppTheme.textPrimaryColor)),
         Row(
           children: [
@@ -185,7 +235,6 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
     });
   }
 
-  // --- Lógica para Contactos Adicionales ---
   void _addOrUpdateContact(Contact contact, {Contact? oldContact}) {
     setState(() {
       if (contact.isEmergencyContact) {
@@ -205,7 +254,7 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
         if (_additionalContacts.where((c) => c.isEmergencyContact).isEmpty &&
             _additionalContacts.isNotEmpty) {
           if (contact.isEmergencyContact ||
-              _additionalContacts.length == 1 && contact.isEmergencyContact) {
+              (_additionalContacts.length == 1 && contact.isEmergencyContact)) { // Fixed condition
             _additionalContacts[
                     _additionalContacts.indexWhere((c) => c.id == contact.id)] =
                 contact.copyWith(isEmergencyContact: true);
@@ -218,6 +267,10 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
   void _deleteContact(Contact contact) {
     setState(() {
       _additionalContacts.removeWhere((c) => c.id == contact.id);
+      // Add logic to set new emergency contact if the deleted one was it
+       if (contact.isEmergencyContact && _additionalContacts.isNotEmpty && _additionalContacts.where((c) => c.isEmergencyContact).isEmpty) {
+        _additionalContacts[0] = _additionalContacts[0].copyWith(isEmergencyContact: true);
+      }
     });
   }
 
@@ -231,9 +284,7 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
       }).toList();
     });
   }
-  // --- Fin Lógica para Contactos Adicionales ---
 
-  // --- Lógica para Representantes Legales ---
   void _addOrUpdateLegalRepresentative(LegalRepresentative representative,
       {LegalRepresentative? oldRepresentative}) {
     setState(() {
@@ -254,7 +305,6 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
       _legalRepresentatives.removeWhere((r) => r.id == representative.id);
     });
   }
-  // --- Fin Lógica para Representantes Legales ---
 
   @override
   Widget build(BuildContext context) {
@@ -269,8 +319,8 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
             child: Scaffold(
               appBar: AppBar(
                 automaticallyImplyLeading: false,
-                leading: BackButton( // Siempre visible
-                    color: AppTheme.textPrimaryColor, // Color consistente con otras vistas
+                leading: BackButton(
+                    color: AppTheme.textPrimaryColor,
                     onPressed: () => Navigator.of(context).pop()),
                 title: _buildHeader(),
                 toolbarHeight: 80,
@@ -290,13 +340,13 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Completar informacion de personas',
+                                'Editar Información de Persona', // Changed Title
                                 style: AppTypography.h2
                                     .copyWith(color: AppTheme.textPrimaryColor),
                               ),
                               const SizedBox(height: Spacing.sm),
                               Text(
-                                'La información ingresada no se encuentra en la base de datos.',
+                                'Modifique los datos de la persona seleccionada.', // Changed Subtitle
                                 style: AppTypography.bodyLg
                                     .copyWith(color: AppTheme.textPrimaryColor),
                               ),
@@ -377,13 +427,16 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
   }
 
   void _nextStep() {
-    // añadir validaciones antes de pasar al siguiente paso
     if (_currentStep < 4) {
       setState(() {
         _currentStep++;
       });
     } else {
-      print('Finalizar formulario');
+      // Final step: Save changes
+      print('Guardar Cambios - Persona: ${_numeroDocumentoController.text}');
+      // Here you would typically call an API to update the person's data
+      // For now, just pop the screen as an example
+      Navigator.of(context).pop(); 
     }
   }
 
@@ -408,6 +461,8 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
   }
 
   Widget _buildActionButtons(bool isMobile) {
+    final String continueText = _currentStep == 4 ? 'Guardar Cambios' : 'Continuar';
+
     final Widget backButton = OutlinedButton(
       onPressed: _previousStep,
       style: OutlinedButton.styleFrom(
@@ -435,10 +490,11 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
           if (_currentStep > 1) const SizedBox(width: Spacing.md),
           Expanded(
             child: AppButton(
-              text: _currentStep == 4 ? 'Finalizar' : 'Continuar',
+              text: continueText,
               onPressed: _nextStep,
             ),
           ),
+           // Show cancel button always on mobile if it's the first step, similar to create form
           if (_currentStep == 1) ...[
             const SizedBox(width: Spacing.md),
             Expanded(child: cancelButton),
@@ -454,20 +510,19 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
         ),
-        child: Text(_currentStep == 4 ? 'Finalizar' : 'Continuar'),
+        child: Text(continueText),
       );
 
       List<Widget> webButtons = [];
+      // Always show Cancel button on web for edit form for consistency, or only on first step
+      webButtons.add(cancelButton);
+      webButtons.add(const SizedBox(width: Spacing.md));
+
       if (_currentStep > 1) {
         webButtons.add(backButton);
         webButtons.add(const SizedBox(width: Spacing.md));
       }
-
-      if (_currentStep == 1) {
-        webButtons.add(cancelButton);
-        webButtons.add(const SizedBox(width: Spacing.md));
-      }
-
+      
       webButtons.add(continueButtonWeb);
 
       return Row(

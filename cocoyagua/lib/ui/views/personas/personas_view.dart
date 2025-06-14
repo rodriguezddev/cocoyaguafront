@@ -9,9 +9,10 @@ import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../widgets/sidebar_menu.dart';
 import 'persona_information_form.dart';
-import '../../components/tables/app_table.dart'; // <-- Importa el nuevo componente
+import 'edit_persona_information_form.dart';
+import '../../widgets/dialogs/person_details_dialog.dart';
+import '../../components/tables/app_table.dart';
 
-// Definir la clase Persona
 class Persona {
   final String nombreCompleto;
   final String tipoDocumento;
@@ -38,16 +39,25 @@ class PersonasView extends StatefulWidget {
 class _PersonasViewState extends State<PersonasView> {
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _documentoController = TextEditingController();
-  String? _selectedOption = 'Natural';
   String? _selectedOptionFilter = 'Nombre';
+  String? _selectedTipoPersonaFilter = 'Natural';
   String? _selectedTipoDocumento = 'DNI';
   int _currentPage = 0;
   final int _rowsPerPage = 5;
+
+  @override
+  void dispose() {
+    _userController.dispose();
+    _documentoController.dispose();
+    super.dispose();
+  }
 
   void _mostrarDialogoCrearPersona(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        String? selectedTipoPersonaDialogo = 'Natural';
+
         return AlertDialog(
           title: Padding(
             padding: const EdgeInsets.only(bottom: 18.0),
@@ -60,54 +70,76 @@ class _PersonasViewState extends State<PersonasView> {
               textAlign: TextAlign.center,
             ),
           ),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('Complete los siguientes datos',
-                    style: AppTypography.body2.copyWith(
-                      color: AppTheme.texttableColor,
-                    )),
-                const SizedBox(height: 16),
-                AppSelect<String>(
-                  label: 'Tipo de documento',
-                  value: _selectedTipoDocumento,
-                  options: const ['DNI', 'Pasaporte', 'Carnet de Extranjería'],
-                  labelBuilder: (v) => v,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedTipoDocumento = value;
-                    });
-                  },
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setStateDialog) {
+              return SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Complete los siguientes datos',
+                      style: AppTypography.body2.copyWith(
+                        color: AppTheme.texttableColor,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    AppSelect<String>(
+                      label: 'Tipo de persona',
+                      value: selectedTipoPersonaDialogo,
+                      options: const ['Natural', 'Jurídica'],
+                      labelBuilder: (v) => v,
+                      onChanged: (value) {
+                        setStateDialog(() {
+                          selectedTipoPersonaDialogo = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    AppSelect<String>(
+                      label: 'Tipo de documento',
+                      value: _selectedTipoDocumento,
+                      options: const [
+                        'DNI',
+                        'Pasaporte',
+                        'Carnet de Extranjería'
+                      ],
+                      labelBuilder: (v) => v,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedTipoDocumento = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    AppInput(
+                      label: 'Número de documento',
+                      controller: _documentoController,
+                      hintText: 'Ingrese número de documento',
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: AppButton(
+                        text: 'Continuar',
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PersonInformationForm(
+                                tipoDocumento: _selectedTipoDocumento ?? 'DNI',
+                                numeroDocumento: _documentoController.text,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                AppInput(
-                  label: 'Número de documento',
-                  controller: _documentoController,
-                  hintText: 'Ingrese número de documento',
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: AppButton(
-                    text: 'Continuar',
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PersonInformationForm(
-                            tipoDocumento: _selectedTipoDocumento ?? 'DNI',
-                            numeroDocumento: _documentoController.text,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+              );
+            },
           ),
         );
       },
@@ -149,10 +181,8 @@ class _PersonasViewState extends State<PersonasView> {
                   children: [
                     if (isMobile)
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment
-                            .end, // Aligns children to the end (right)
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          // Container 1: Search Input
                           AppInput(
                             hintText: 'Buscar',
                             controller: _userController,
@@ -161,24 +191,22 @@ class _PersonasViewState extends State<PersonasView> {
                             isLabelVisible: false,
                           ),
                           const SizedBox(height: Spacing.md),
-                          // Container 2: Selects and Button
                           Column(
-                            crossAxisAlignment: CrossAxisAlignment
-                                .end, // Also align children of this group to the end
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              AppSelect(
-                                value: _selectedOption,
+                              AppSelect<String>(
+                                value: _selectedTipoPersonaFilter,
                                 label: 'Tipo de persona',
                                 options: const ['Natural', 'Jurídica'],
                                 labelBuilder: (v) => v,
                                 onChanged: (value) {
                                   setState(() {
-                                    _selectedOption = value;
+                                    _selectedTipoPersonaFilter = value;
                                   });
                                 },
                               ),
                               const SizedBox(height: Spacing.md),
-                              AppSelect(
+                              AppSelect<String>(
                                 value: _selectedOptionFilter,
                                 label: 'Filtrar por',
                                 options: const ['Nombre', 'Documento'],
@@ -190,8 +218,6 @@ class _PersonasViewState extends State<PersonasView> {
                                 },
                               ),
                               const SizedBox(height: Spacing.md),
-                              // Button is no longer wrapped in SizedBox(width: double.infinity)
-                              // so it can align to the end based on its parent's crossAxisAlignment.
                               AppButton(
                                 text: 'Crear Persona',
                                 icon: Icons.add,
@@ -220,14 +246,14 @@ class _PersonasViewState extends State<PersonasView> {
                               const SizedBox(width: Spacing.md),
                               Expanded(
                                 flex: 1,
-                                child: AppSelect(
-                                  value: _selectedOption,
+                                child: AppSelect<String>(
+                                  value: _selectedTipoPersonaFilter,
                                   label: 'Tipo de persona',
                                   options: const ['Natural', 'Jurídica'],
                                   labelBuilder: (v) => v,
                                   onChanged: (value) {
                                     setState(() {
-                                      _selectedOption = value;
+                                      _selectedTipoPersonaFilter = value;
                                     });
                                   },
                                 ),
@@ -235,7 +261,7 @@ class _PersonasViewState extends State<PersonasView> {
                               const SizedBox(width: Spacing.md),
                               Expanded(
                                 flex: 1,
-                                child: AppSelect(
+                                child: AppSelect<String>(
                                   value: _selectedOptionFilter,
                                   label: 'Filtrar por',
                                   options: const ['Nombre', 'Documento'],
@@ -249,10 +275,9 @@ class _PersonasViewState extends State<PersonasView> {
                               ),
                               const SizedBox(width: Spacing.md),
                               Column(
-                                mainAxisAlignment: MainAxisAlignment
-                                    .start, // o .center dependiendo del efecto
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  SizedBox(height: 28),
+                                  const SizedBox(height: 28),
                                   AppButton(
                                     text: 'Crear Persona',
                                     onPressed: () =>
@@ -268,8 +293,7 @@ class _PersonasViewState extends State<PersonasView> {
                     AppCard(
                       child: SizedBox(
                         width: double.infinity,
-                        child:
-                            _buildAppTable(), // <-- Aquí uso la tabla reusable
+                        child: _buildAppTable(),
                       ),
                     ),
                   ],
@@ -345,11 +369,38 @@ class _PersonasViewState extends State<PersonasView> {
             DataCell(Text(persona.tipoPersona,
                 style: TextStyle(color: AppTheme.texttableColor))),
             DataCell(
-              IconButton(
-                icon: const Icon(Icons.edit, color: AppTheme.texttableColor),
-                onPressed: () {
-                  // Acción editar persona aquí
-                },
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.visibility,
+                        color: AppTheme.texttableColor),
+                    tooltip: 'Ver Detalles',
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return PersonDetailsDialog(persona: persona);
+                        },
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon:
+                        const Icon(Icons.edit, color: AppTheme.texttableColor),
+                    tooltip: 'Editar',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditPersonInformationForm(
+                            personaToEdit: persona,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
           ],

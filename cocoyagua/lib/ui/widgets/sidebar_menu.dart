@@ -83,9 +83,10 @@ class SidebarMenu extends StatelessWidget {
           ]),
           _buildExpansionTile(context, 'Facturación', Icons.settings, [
             _subTile(context, 'Periodos de facturación', '/facturacion/periodos_facturación'),
-            _subTile(context, 'Lecturas', '/facturacion/lecturas'),
+            _subTile(context, 'Lecturas', '/facturacion/lecturas'), // Comentado si Lectura de Medidores lo reemplaza
             _subTile(context, 'Pedidos', '/facturacion/pedidos'),
             _subTile(context, 'Facturas', '/facturacion/facturas'),
+            _subTile(context, 'Lectura de Medidores', '/facturacion/lecturas-medidores'), // <-- Nueva entrada
           ]),
           _buildExpansionTile(context, 'Información de Pago', Icons.settings, [
             _subTile(context, 'Recibos', '/información_pago/recibos'),

@@ -1,4 +1,6 @@
 import 'package:cocoyagua/ui/views/contratos/contratos_view.dart';
+import 'package:cocoyagua/ui/views/lecturas/lecturas_view.dart';
+import 'package:cocoyagua/ui/views/pedidos/pedidos_view.dart';
 import 'package:cocoyagua/ui/views/personas/personas_view.dart';
 import 'package:cocoyagua/ui/views/solicitudes/solicitudes_view.dart';
 import 'package:cocoyagua/ui/views/titular/titulares_view.dart';
@@ -46,6 +48,8 @@ class _MyAppState extends State<MyApp> {
         '/gestion&saneamiento/solicitudes': (_) => const SolicitudesView(),
         '/gestion&saneamiento/titulares': (_) => const TitularesView(), 
         '/gestion&saneamiento/contratos': (_) => const ContratosView(), 
+        '/facturacion/lecturas-medidores': (_) => const LecturasView(), 
+        '/facturacion/pedidos': (_) => const PedidosView(), // Ruta para el nuevo módulo de Pedidos
         '/bitacora': (_) => const DummyPage('Bitácora'),
         
       },
