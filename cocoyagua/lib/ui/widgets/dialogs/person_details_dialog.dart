@@ -1,4 +1,4 @@
-import 'package:cocoyagua/ui/views/personas/personas_view.dart'; // For Persona model
+import 'package:cocoyagua/ui/views/personas/personas_view.dart'; // For Persona model and RolPersona helpers
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/typography.dart';
@@ -58,6 +58,7 @@ class PersonDetailsDialog extends StatelessWidget {
             _buildDetailRow(context, 'Nro. Documento', persona.nroDocumento),
             _buildDetailRow(context, 'Género', persona.genero),
             _buildDetailRow(context, 'Tipo de Persona', persona.tipoPersona),
+            _buildDetailRow(context, 'Roles', persona.roles.map(rolPersonaToString).join(', ')), // Mostrar Roles
           ],
         ),
       ),

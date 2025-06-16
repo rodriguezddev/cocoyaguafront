@@ -1,5 +1,6 @@
 import 'package:cocoyagua/ui/views/contratos/contratos_view.dart';
 import 'package:cocoyagua/ui/views/lecturas/lecturas_view.dart';
+import 'package:cocoyagua/ui/views/login/forgot_password_view.dart';
 import 'package:cocoyagua/ui/views/pedidos/pedidos_view.dart';
 import 'package:cocoyagua/ui/views/personas/personas_view.dart';
 import 'package:cocoyagua/ui/views/solicitudes/solicitudes_view.dart';
@@ -37,6 +38,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       home:
           isLoggedIn ? const DashboardView() : LoginView(onLogin: handleLogin),
+      initialRoute: isLoggedIn ? '/dashboard' : '/',
       routes: {
         '/dashboard': (_) => const DashboardView(),
         '/gestion/personas': (context) => const PersonasView(),
@@ -50,8 +52,8 @@ class _MyAppState extends State<MyApp> {
         '/gestion&saneamiento/contratos': (_) => const ContratosView(), 
         '/facturacion/lecturas-medidores': (_) => const LecturasView(), 
         '/facturacion/pedidos': (_) => const PedidosView(), // Ruta para el nuevo módulo de Pedidos
-        '/bitacora': (_) => const DummyPage('Bitácora'),
-        
+        '/bitacora': (_) => const DummyPage('Bitácora'),  
+        '/forgot-password': (_) => const ForgotPasswordView(), // Ruta para recuperar contraseña
       },
     );
   }

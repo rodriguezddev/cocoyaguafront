@@ -20,7 +20,7 @@ import 'form_steps/step1_personal_info.dart';
 import 'form_steps/step2_addresses_info.dart';
 import 'form_steps/step3_contacts_info.dart';
 import 'form_steps/step4_legal_representatives_info.dart';
-import 'personas_view.dart'; // Required for Persona model
+import 'personas_view.dart'; // Required for Persona model and RolPersona
 
 class EditPersonInformationForm extends StatefulWidget {
   final Persona personaToEdit;
@@ -35,7 +35,12 @@ class EditPersonInformationForm extends StatefulWidget {
   final String? initialSelectedProfession;
   final List<Address>? initialAddresses;
   final List<Contact>? initialAdditionalContacts;
+  // Campos para Persona Jurídica al editar
+  final String? initialNombreOrganizacion;
+  final String? initialFechaFundacion;
+  final String? initialRepresentante;
   final List<LegalRepresentative>? initialLegalRepresentatives;
+  // No necesitamos initialRoles aquí explícitamente, lo tomaremos de personaToEdit.roles
 
   const EditPersonInformationForm({
     super.key,
@@ -51,6 +56,9 @@ class EditPersonInformationForm extends StatefulWidget {
     this.initialAddresses,
     this.initialAdditionalContacts,
     this.initialLegalRepresentatives,
+    this.initialNombreOrganizacion,
+    this.initialFechaFundacion,
+    this.initialRepresentante,
   });
 
   @override
@@ -70,12 +78,17 @@ class _EditPersonInformationFormState extends State<EditPersonInformationForm> {
   final _fechaNacimientoController = TextEditingController();
   final _telefonoController = TextEditingController();
   final _correoController = TextEditingController();
+  // Controladores para Persona Jurídica
+  final _nombreOrganizacionController = TextEditingController();
+  final _fechaFundacionController = TextEditingController();
+  final _representanteController = TextEditingController();
 
   // Selected values for Dropdowns
   String? _selectedPersonType;
   String? _selectedGender;
   String? _selectedDocumentType;
   String? _selectedProfession;
+  Set<RolPersona> _selectedRoles = {};
 
   List<Address> _addresses = [];
   List<Contact> _additionalContacts = [];
@@ -132,6 +145,15 @@ class _EditPersonInformationFormState extends State<EditPersonInformationForm> {
     _correoController.text = widget.initialCorreo ?? '';
     _selectedProfession = widget.initialSelectedProfession;
 
+    // Pre-fill para persona jurídica si aplica
+    if (widget.personaToEdit.tipoPersona == 'Jurídica') {
+      _nombreOrganizacionController.text = widget.initialNombreOrganizacion ?? '';
+      _fechaFundacionController.text = widget.initialFechaFundacion ?? '';
+      _representanteController.text = widget.initialRepresentante ?? '';
+    }
+    // Cargar roles desde personaToEdit
+    _selectedRoles = widget.personaToEdit.roles.toSet();
+
     _addresses = widget.initialAddresses != null ? List<Address>.from(widget.initialAddresses!) : [];
     _additionalContacts = widget.initialAdditionalContacts != null ? List<Contact>.from(widget.initialAdditionalContacts!) : [];
     _legalRepresentatives = widget.initialLegalRepresentatives != null ? List<LegalRepresentative>.from(widget.initialLegalRepresentatives!) : [];
@@ -157,6 +179,9 @@ class _EditPersonInformationFormState extends State<EditPersonInformationForm> {
     _fechaNacimientoController.dispose();
     _telefonoController.dispose();
     _correoController.dispose();
+    _nombreOrganizacionController.dispose();
+    _fechaFundacionController.dispose();
+    _representanteController.dispose();
     super.dispose();
   }
 
@@ -396,6 +421,17 @@ class _EditPersonInformationFormState extends State<EditPersonInformationForm> {
           genderOptions: _genderOptions,
           documentTypeOptions: _documentTypeOptions,
           professionOptions: _professionOptions,
+          // Pasar controladores de persona jurídica
+          nombreOrganizacionController: _nombreOrganizacionController,
+          fechaFundacionController: _fechaFundacionController,
+          representanteController: _representanteController,
+          // Pasar roles y callback
+          selectedRoles: _selectedRoles,
+          onRoleSelected: (RolPersona rol, bool isSelected) {
+            setState(() {
+              isSelected ? _selectedRoles.add(rol) : _selectedRoles.remove(rol);
+            });
+          },
         );
       case 2:
         return Step2AddressesInfo(

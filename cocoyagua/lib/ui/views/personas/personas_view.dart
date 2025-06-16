@@ -13,12 +13,27 @@ import 'edit_persona_information_form.dart';
 import '../../widgets/dialogs/person_details_dialog.dart';
 import '../../components/tables/app_table.dart';
 
+// Enum para los roles de persona
+enum RolPersona { cliente, empleado, proveedor }
+
+// Helper para convertir enum a String legible
+String rolPersonaToString(RolPersona rol) {
+  switch (rol) {
+    case RolPersona.cliente:
+      return 'Cliente';
+    case RolPersona.empleado:
+      return 'Empleado';
+    case RolPersona.proveedor:
+      return 'Proveedor';
+  }
+}
 class Persona {
   final String nombreCompleto;
   final String tipoDocumento;
   final String nroDocumento;
   final String genero;
   final String tipoPersona;
+  final List<RolPersona> roles;
 
   Persona({
     required this.nombreCompleto,
@@ -26,6 +41,7 @@ class Persona {
     required this.nroDocumento,
     required this.genero,
     required this.tipoPersona,
+     this.roles = const [],
   });
 }
 
@@ -130,6 +146,7 @@ class _PersonasViewState extends State<PersonasView> {
                               builder: (context) => PersonInformationForm(
                                 tipoDocumento: _selectedTipoDocumento ?? 'DNI',
                                 numeroDocumento: _documentoController.text,
+                                initialPersonType: selectedTipoPersonaDialogo,
                               ),
                             ),
                           );
@@ -149,10 +166,13 @@ class _PersonasViewState extends State<PersonasView> {
   final List<Persona> personas = List.generate(8, (index) {
     return Persona(
       nombreCompleto: 'María Reina Saavedra Quiróz',
-      tipoDocumento: 'DNI',
-      nroDocumento: '4545678765677755',
+      tipoDocumento: index % 2 == 0 ? 'DNI' : 'RUC',
+      nroDocumento: '4545678${index}65677755',
       genero: 'Femenino',
-      tipoPersona: 'Natural',
+      tipoPersona: index % 2 == 0 ? 'Natural' : 'Jurídica',
+      roles: index % 3 == 0
+          ? [RolPersona.cliente, RolPersona.empleado]
+          : (index % 3 == 1 ? [RolPersona.proveedor] : [RolPersona.cliente]),
     );
   });
 
@@ -345,6 +365,7 @@ class _PersonasViewState extends State<PersonasView> {
         'NRO. DOCUMENTO',
         'GÉNERO',
         'TIPO DE PERSONA',
+        'ROLES',
         '',
       ],
       items: personas,
@@ -367,6 +388,11 @@ class _PersonasViewState extends State<PersonasView> {
             DataCell(Text(persona.genero,
                 style: TextStyle(color: AppTheme.texttableColor))),
             DataCell(Text(persona.tipoPersona,
+                style: TextStyle(color: AppTheme.texttableColor))),
+                DataCell(Text(
+                persona.roles
+                    .map(rolPersonaToString)
+                    .join(', '), // Mostrar roles
                 style: TextStyle(color: AppTheme.texttableColor))),
             DataCell(
               Row(
@@ -395,6 +421,7 @@ class _PersonasViewState extends State<PersonasView> {
                         MaterialPageRoute(
                           builder: (context) => EditPersonInformationForm(
                             personaToEdit: persona,
+                            // initialRoles: persona.roles,
                           ),
                         ),
                       );

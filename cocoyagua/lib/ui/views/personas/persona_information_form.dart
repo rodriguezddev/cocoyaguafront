@@ -20,18 +20,31 @@ import 'form_steps/step1_personal_info.dart';
 import 'form_steps/step2_addresses_info.dart';
 import 'form_steps/step3_contacts_info.dart';
 import 'form_steps/step4_legal_representatives_info.dart';
+import 'personas_view.dart' show RolPersona, rolPersonaToString; // Importar RolPersona y helper
 
 class PersonInformationForm extends StatefulWidget {
   final String tipoDocumento;
   final String numeroDocumento;
-  final String? initialPersonType; // Nuevo parámetro
+  final String? initialPersonType;
+  // Campos para Persona Jurídica
+  final String? initialNombreOrganizacion;
+  final String? initialFechaFundacion; // Formato 'DD/MM/AAAA' o DateTime
+  final String? initialRepresentante; // ID o nombre
+  final List<RolPersona>? initialRoles;
 
   const PersonInformationForm(
       {super.key,
       required this.tipoDocumento,
       required this.numeroDocumento,
-      this.initialPersonType // Añadir al constructor
+      this.initialPersonType,
+      this.initialNombreOrganizacion,
+      this.initialFechaFundacion,
+      this.initialRepresentante,
+      this.initialRoles,
       });
+
+  bool get isJuridicaInitial => initialPersonType == 'Jurídica';
+
   @override
   State<PersonInformationForm> createState() => _PersonInformationFormState();
 }
@@ -48,12 +61,18 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
   final _fechaNacimientoController = TextEditingController();
   final _telefonoController = TextEditingController();
   final _correoController = TextEditingController();
+  // Controladores para Persona Jurídica
+  final _nombreOrganizacionController = TextEditingController();
+  final _fechaFundacionController = TextEditingController();
+  final _representanteController = TextEditingController(); // Para el ID o nombre del representante
+
 
   // Selected values for Dropdowns
   String? _selectedPersonType;
   String? _selectedGender;
   String? _selectedDocumentType;
   String? _selectedProfession;
+  Set<RolPersona> _selectedRoles = {}; // Para almacenar los roles seleccionados
 
   List<Address> _addresses = []; // Lista para almacenar direcciones
   List<Contact> _additionalContacts = []; // Lista para contactos adicionales
@@ -95,6 +114,16 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
     _selectedDocumentType = widget.tipoDocumento;
     _numeroDocumentoController.text = widget.numeroDocumento;
     _selectedPersonType = widget.initialPersonType; // Usar el tipo de persona inicial
+
+    if (widget.isJuridicaInitial) {
+      _nombreOrganizacionController.text = widget.initialNombreOrganizacion ?? '';
+      _fechaFundacionController.text = widget.initialFechaFundacion ?? '';
+      _representanteController.text = widget.initialRepresentante ?? '';
+    }
+
+    if (widget.initialRoles != null) {
+      _selectedRoles = widget.initialRoles!.toSet();
+    }
   }
 
   @override
@@ -107,6 +136,9 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
     _fechaNacimientoController.dispose();
     _telefonoController.dispose();
     _correoController.dispose();
+    _nombreOrganizacionController.dispose();
+    _fechaFundacionController.dispose();
+    _representanteController.dispose();
     super.dispose();
   }
 
@@ -346,6 +378,17 @@ class _PersonInformationFormState extends State<PersonInformationForm> {
           genderOptions: _genderOptions,
           documentTypeOptions: _documentTypeOptions,
           professionOptions: _professionOptions,
+          // Pasar controladores de persona jurídica
+          nombreOrganizacionController: _nombreOrganizacionController,
+          fechaFundacionController: _fechaFundacionController,
+          representanteController: _representanteController,
+          // Pasar roles y callback
+          selectedRoles: _selectedRoles,
+          onRoleSelected: (RolPersona rol, bool isSelected) {
+            setState(() {
+              isSelected ? _selectedRoles.add(rol) : _selectedRoles.remove(rol);
+            });
+          },
         );
       case 2:
         return Step2AddressesInfo(

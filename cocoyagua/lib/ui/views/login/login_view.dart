@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../components/inputs/app_input.dart';
 import '../../components/buttons/app_button.dart';
 import '../../components/layout/app_navbar.dart';
+import 'forgot_password_view.dart'; // Importar la nueva vista
 
 class LoginView extends StatefulWidget {
   final VoidCallback onLogin;
@@ -54,7 +55,12 @@ class _LoginViewState extends State<LoginView> {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ForgotPasswordView()),
+                );
+              },
               child: const Text('¿Olvidaste tu contraseña?'),
             ),
           ),

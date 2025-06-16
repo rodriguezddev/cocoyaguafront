@@ -32,22 +32,37 @@ class AppTable<T> extends StatelessWidget {
         return widths;
       }
 
-      // Asignar FlexColumnWidth a la mayoría de las columnas
+      // Asignar FlexColumnWidth por defecto a todas las columnas
       for (int i = 0; i < columns.length; i++) {
         widths[i] = const FlexColumnWidth(1.0);
       }
 
-      // Dar un poco más de espacio a la primera columna (si existe)
-      if (columns.isNotEmpty) {
-        widths[0] = const FlexColumnWidth(0.8); // Reducir el flex para la columna ID
+      // Ajustes específicos basados en el título de la columna (o índice si es más genérico)
+      // Esto es un ejemplo, idealmente se pasaría una configuración o se usarían índices si los nombres no son fijos.
+      for (int i = 0; i < columns.length; i++) {
+        final columnTitle = columns[i].toUpperCase(); // Convertir a mayúsculas para comparación insensible
+        if (columnTitle == 'NOMBRE COMPLETO') {
+          widths[i] = const FlexColumnWidth(1.8); // Más espacio para Nombre Completo
+        } else if (columnTitle == 'GÉNERO') {
+          widths[i] = const FlexColumnWidth(0.6); // Menos espacio para Género
+        } else if (columnTitle == 'ROLES') {
+          widths[i] = const FlexColumnWidth(0.7); // Menos espacio para Roles
+        } else if (columnTitle == 'DOCUMENTO' && columns.length > 3) { // Asumiendo que 'DOCUMENTO' es el tipo
+          widths[i] = const FlexColumnWidth(0.8);
+        }
+         // La columna de ID (si es la primera y no es Nombre Completo) podría tener un flex menor
+        if (i == 0 && columnTitle != 'NOMBRE COMPLETO' && !columnTitle.contains("ID")) { // Ejemplo si la primera no es ID
+            // No hacer nada especial, ya tiene Flex 1.0
+        } else if (i == 0 && (columnTitle.contains("ID") || columnTitle.contains("Nº"))) {
+             widths[i] = const FlexColumnWidth(0.5); // Menos espacio para IDs
+        }
       }
 
-      // Asignar un ancho fijo más grande a la última columna (para acciones)
-      if (columns.length > 1) { // Asegurarse de que hay al menos dos columnas para que "última" sea distinta de "primera" en algunos casos
+      // Asignar un ancho fijo a la última columna si es para acciones (generalmente vacía o con iconos)
+      if (columns.isNotEmpty && columns.last.isEmpty) {
         widths[columns.length - 1] = const FixedColumnWidth(190.0); // Aumentar ligeramente para más espacio en Acciones
-      } else if (columns.length == 1) { // Si solo hay una columna, que también tenga un ancho fijo razonable o flex
-        widths[0] = const FixedColumnWidth(190.0); // O FlexColumnWidth(1.0) si se prefiere que ocupe todo el espacio
       }
+
       return widths;
     }
 
